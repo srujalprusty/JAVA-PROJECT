@@ -136,7 +136,7 @@ public class Star_Bazar {
         System.out.println("--------------");
 
         for (Product item : productList) {
-            System.out.println(item.getGrocery() + " (" + item.getQuantityUnit() + ") - ₹" + item.getPrice());
+            System.out.println(item.getGrocery()+" "+item.getImage() + " (" + item.getQuantityUnit() + ") - ₹" + item.getPrice() + "/-" +" "+ item.getQuantityUnit());
         }
 
         int choice;
