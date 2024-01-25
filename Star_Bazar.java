@@ -1,213 +1,214 @@
-package Grocery;
-
-import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 class Product {
-    private String Grocery;
-    private int Price;
-    private String image;
+    private String name;
+    private int price;
+    private ImageIcon image;
     private String category;
     private String quantityUnit;
 
-    public Product(String Grocery, int Price, String image, String category, String quantityUnit) {
-        this.Grocery = Grocery;
-        this.Price = Price;
-        this.image = image;
+    public Product(String name, int price, String imagePath, String category, String quantityUnit) {
+        this.name = name;
+        this.price = price;
+        this.image = new ImageIcon(imagePath);
         this.category = category;
         this.quantityUnit = quantityUnit;
     }
 
-    Product() {
-    }
-
-    public String getGrocery() {
-        return Grocery;
-    }
-
-    public void setGrocery(String Grocery) {
-        this.Grocery = Grocery;
+    public String getName() {
+        return name;
     }
 
     public int getPrice() {
-        return Price;
+        return price;
     }
 
-    public void setPrice(int Price) {
-        this.Price = Price;
-    }
-
-    public String getImage() {
+    public ImageIcon getImage() {
         return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public String getQuantityUnit() {
         return quantityUnit;
     }
-
-    public void setQuantityUnit(String quantityUnit) {
-        this.quantityUnit = quantityUnit;
-    }
 }
 
-class CustomerCart extends Product {
-    private int Quantity;
-    public List<CustomerCart> items;
+class ShoppingCart {
+    private List<Product> items;
+    private List<Integer> quantities;
 
-    public CustomerCart() {
+    public ShoppingCart() {
         items = new ArrayList<>();
+        quantities = new ArrayList<>();
     }
 
-    public int getQuantity() {
-        return Quantity;
+    public void addItem(Product product, int quantity) {
+        items.add(product);
+        quantities.add(quantity);
     }
 
-    public void setQuantity(int Quantity) {
-        this.Quantity = Quantity;
+    public void removeItem(int index) {
+        items.remove(index);
+        quantities.remove(index);
     }
 
-    public void addItem(CustomerCart cart) {
-        items.add(cart);
-    }
-    public void removeItem(CustomerCart cart){
-        items.remove(cart);
+    public List<Product> getItems() {
+        return items;
     }
 
-    public void displayCart() {
-        System.out.println("🛒 Your Shopping Cart:");
-        for (CustomerCart item : items) {
-            int t = item.getPrice() * item.getQuantity();
-            System.out.println(item.getGrocery() + " (" + item.getQuantity() + " " + item.getQuantityUnit() + ") - ₹" + item.getPrice() +" = Total-Price-->" +t+"₹");
-        }
+    public List<Integer> getQuantities() {
+        return quantities;
     }
 
     public int calculateBill() {
         int total = 0;
-        for (CustomerCart item : items) {
-            total += item.getPrice() * item.getQuantity();
+        for (int i = 0; i < items.size(); i++) {
+            total += items.get(i).getPrice() * quantities.get(i);
         }
         return total;
     }
-
-    public void viewBill() {
-        System.out.println("💰 Your Total Bill: ₹" + calculateBill());
-    }
 }
 
-public class Star_Bazar {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("🌟 Welcome to Star Bazar - Your One-Stop Grocery Store 🌟");
-        System.out.println("About Our Store:");
-        System.out.println("Star Bazar offers a wide range of high-quality groceries. Shop with us for a delightful and convenient experience.");
+public class GroceryStoreGUI extends JFrame {
+    private JTextArea displayArea;
+    private ShoppingCart cart;
 
-        ArrayList<Product> productList = new ArrayList<>();
-        productList.add(new Product("Coca-Cola", 30, "🥤", "Cold Drink", "500 ml"));
-        productList.add(new Product("Potatoes", 40, "🥔", "Vegetable", "kg"));
-        productList.add(new Product("Milk", 30, "🥛", "Daily Use", "liter"));
-        productList.add(new Product("Tomatoes", 25, "🍅", "Vegetable", "kg"));
-        productList.add(new Product("Bread", 20, "🍞", "Daily Use", "unit"));
-        productList.add(new Product("Lays Chips", 20, "🍟", "Snack", "gram"));
-        productList.add(new Product("Orange Juice", 50, "🍊", "Cold Drink", "liter"));
-        productList.add(new Product("Onions", 30, "🧅", "Vegetable", "kg"));
-        productList.add(new Product("Toothpaste", 25, "🦷", "Daily Use", "unit"));
-        productList.add(new Product("Bananas", 20, "🍌", "Fruit", "kg"));
-        productList.add(new Product("Eggs", 60, "🥚", "Daily Use", "dozen"));
-        productList.add(new Product("Cucumber", 15, "🥒", "Vegetable", "unit"));
+    public GroceryStoreGUI() {
+        cart = new ShoppingCart();
+        initializeUI();
+    }
 
-        System.out.println("\n🛍️ Explore Our Catalog by Categories:");
-        System.out.println("--------------");
-        System.out.println("1. Cold Drinks");
-        System.out.println("2. Vegetables");
-        System.out.println("3. Daily Use");
-        System.out.println("4. Snacks");
-        System.out.println("5. Fruits");
-        System.out.println("--------------");
+    private void initializeUI() {
+        setTitle("Star Bazar - Grocery Store");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        for (Product item : productList) {
-            System.out.println(item.getGrocery()+" "+item.getImage() + " (" + item.getQuantityUnit() + ") - ₹" + item.getPrice() + "/-" +" "+ item.getQuantityUnit());
-        }
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
 
-        int choice;
-        CustomerCart cart = new CustomerCart();
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 4));
+        createProductButtons(buttonPanel);
 
-        do {
-            System.out.println("\nSelect an option:");
-            System.out.println("1- Add a Product to Cart");
-            System.out.println("2- Remove a Product from cart");
-            System.out.println("3- View Your Shopping Cart");
-            System.out.println("4- View Your Total Bill");
-            System.out.println("5- Exit");
-            System.out.print("Enter your Choice: ");
-
-            choice = sc.nextInt();
-
-            switch (choice) {
-                case 1:
-                    System.out.print("\nEnter Product Name to cart: ");
-                    String productName = sc.next();
-                    boolean productFound = false;
-
-                    for (Product product : productList) {
-                        if (productName.equalsIgnoreCase(product.getGrocery())) {
-                            System.out.print("Enter the Quantity: ");
-                            int quantity = sc.nextInt();
-                            CustomerCart cart1 = new CustomerCart();
-                            cart1.setGrocery(product.getGrocery());
-                            cart1.setPrice(product.getPrice());
-                            cart1.setQuantity(quantity);
-                            cart1.setCategory(product.getCategory());
-                            cart1.setQuantityUnit(product.getQuantityUnit());
-                            cart.addItem(cart1);
-
-                            System.out.println("\n" + quantity + " " + product.getQuantityUnit() + " of " + productName + " added to your cart 🛒");
-                            productFound = true;
-                            break;
-                        }
-                    }
-
-                    if (!productFound) {
-                        System.out.println("Product not found 🚫");
-                    }
-                    break;
-                case 2:
-                    System.out.print("\n Enter the Product you want to remove: ");
-                    String product_remove = sc.next();
-                    for (CustomerCart item : cart.items) {
-                        if (product_remove.equalsIgnoreCase(item.getGrocery())) {
-                            cart.removeItem(item);
-                            System.out.println("\n" + product_remove + " is removed from your cart");
-                            break;
-                        }
-                    }
-                case 3:
-                    System.out.println("\n🛒 Here's your Shopping Cart List:");
-                    cart.displayCart();
-                    break;
-
-                case 4:
-                    System.out.println("\n💰 Here's your Total Bill:");
-                    cart.viewBill();
-                    break;
-
-                case 5:
-                    System.out.println("\nThank you for shopping at Star Bazar! 🌟");
-                    System.exit(0);
-
-                default:
-                    System.out.println("Invalid choice");
+        JPanel actionPanel = new JPanel(new FlowLayout());
+        createButton("View Cart", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewCart();
             }
-        } while (choice != 5);
+        }, actionPanel);
+
+        createButton("View Bill", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewBill();
+            }
+        }, actionPanel);
+
+        createButton("Exit", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exitApplication();
+            }
+        }, actionPanel);
+
+        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.NORTH);
+        add(actionPanel, BorderLayout.SOUTH);
+
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    private void createProductButtons(JPanel panel) {
+        List<Product> productList = getProductList();
+
+        for (Product product : productList) {
+            JButton button = new JButton("<html><center>" + product.getName() + "<br>₹" + product.getPrice() +
+                    "<br>" + product.getQuantityUnit() + "</center></html>", product.getImage());
+            button.setVerticalTextPosition(SwingConstants.BOTTOM);
+            button.setHorizontalTextPosition(SwingConstants.CENTER);
+
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addToCart(product);
+                }
+            });
+
+            panel.add(button);
+        }
+    }
+
+    private void createButton(String text, ActionListener listener, JPanel panel) {
+        JButton button = new JButton(text);
+        button.addActionListener(listener);
+        panel.add(button);
+    }
+
+    private void addToCart(Product product) {
+        int quantity = Integer.parseInt(JOptionPane.showInputDialog("Enter the Quantity:"));
+        cart.addItem(product, quantity);
+        displayArea.append(quantity + " " + product.getQuantityUnit() + " of " + product.getName() + " added to your cart 🛒\n");
+    }
+
+    private void viewCart() {
+        displayArea.setText("🛒 Here's your Shopping Cart List:\n");
+        List<Product> items = cart.getItems();
+        List<Integer> quantities = cart.getQuantities();
+
+        for (int i = 0; i < items.size(); i++) {
+            displayArea.append(items.get(i).getName() + " (" + quantities.get(i) +
+                    " " + items.get(i).getQuantityUnit() + ") - ₹" + items.get(i).getPrice() +
+                    "/- " + items.get(i).getQuantityUnit() + "\n");
+        }
+    }
+
+    private void viewBill() {
+        displayArea.setText("💰 Here's your Total Bill:\n");
+        displayArea.append("Total Bill: ₹" + cart.calculateBill() + "\n");
+    }
+
+    private void exitApplication() {
+        JOptionPane.showMessageDialog(this, "Thank you for shopping at Star Bazar! 🌟");
+        System.exit(0);
+    }
+
+    private List<Product> getProductList() {
+        ArrayList<Product> productList = new ArrayList<>();
+
+        productList.add(new Product("Coca-Cola", 30, "path/to/coca_cola_image.png", "Cold Drink", "500 ml"));
+        productList.add(new Product("Potatoes", 40, "path/to/potatoes_image.png", "Vegetable", "kg"));
+        productList.add(new Product("Milk", 30, "path/to/milk_image.png", "Daily Use", "liter"));
+        productList.add(new Product("Tomatoes", 25, "path/to/tomatoes_image.png", "Vegetable", "kg"));
+        productList.add(new Product("Bread", 20, "path/to/bread_image.png", "Daily Use", "unit"));
+        productList.add(new Product("Lays Chips", 20, "path/to/lays_chips_image.png", "Snack", "gram"));
+        productList.add(new Product("Orange Juice", 50, "path/to/orange_juice_image.png", "Cold Drink", "liter"));
+        productList.add(new Product("Onions", 30, "path/to/onions_image.png", "Vegetable", "kg"));
+        productList.add(new Product("Toothpaste", 25, "path/to/toothpaste_image.png", "Daily Use", "unit"));
+        productList.add(new Product("Bananas", 20, "path/to/bananas_image.png", "Fruit", "kg"));
+        productList.add(new Product("Eggs", 60, "path/to/eggs_image.png", "Daily Use", "dozen"));
+        productList.add(new Product("Cucumber", 15, "path/to/cucumber_image.png", "Vegetable", "unit"));
+
+        // Add more products here
+
+        return productList;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new GroceryStoreGUI().setVisible(true);
+            }
+        });
     }
 }
